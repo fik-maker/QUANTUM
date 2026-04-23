@@ -33,7 +33,7 @@ st.markdown("""
 W, H = 1080, 1350
 MARGIN = 55
 # Fuente incluida directamente en el repo junto a app.py
-FONT_PATH = Path(__file__).parent / "FredokaOne-Regular.ttf"
+FONT_PATH = Path(__file__).parent / "Fredoka-VariableFont_wdth,wght.ttf"
 
 # ── Presets basados en los diseños reales ──────────────────────────────────────
 PRESETS = {
