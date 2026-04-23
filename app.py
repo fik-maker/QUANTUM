@@ -34,7 +34,10 @@ W, H = 1080, 1350
 MARGIN = 55
 FONT_DIR = Path("fonts")
 FONT_PATH = FONT_DIR / "FredokaOne.ttf"
-FONT_URL = "https://cdn.jsdelivr.net/gh/google/fonts/ofl/fredokaone/FredokaOne-Regular.ttf"
+FONT_URLS = [
+    "https://cdn.jsdelivr.net/gh/google/fonts/ofl/fredokaone/FredokaOne-Regular.ttf",
+    "https://github.com/google/fonts/raw/main/ofl/fredokaone/FredokaOne-Regular.ttf",
+]
 
 # ── Presets basados en los diseños reales ──────────────────────────────────────
 PRESETS = {
@@ -79,20 +82,22 @@ PRESETS = {
 @st.cache_resource
 def load_font():
     FONT_DIR.mkdir(exist_ok=True)
-    # Borra archivo corrupto/vacío de intentos previos
-    if FONT_PATH.exists() and FONT_PATH.stat().st_size < 1000:
+    if FONT_PATH.exists() and FONT_PATH.stat().st_size < 5000:
         FONT_PATH.unlink()
-
     if not FONT_PATH.exists():
-        try:
-            r = requests.get(FONT_URL, timeout=15)
-            r.raise_for_status()
-            FONT_PATH.write_bytes(r.content)
-        except Exception as e:
-            return None, str(e)
-    return str(FONT_PATH), None
+        headers = {"User-Agent": "Mozilla/5.0"}
+        for url in FONT_URLS:
+            try:
+                r = requests.get(url, headers=headers, timeout=15)
+                r.raise_for_status()
+                FONT_PATH.write_bytes(r.content)
+                break
+            except Exception:
+                continue
+    return str(FONT_PATH) if FONT_PATH.exists() else None
 
-_font_path, _font_err = load_font()
+_font_path = load_font()
+_font_err  = None if _font_path else "No se pudo descargar la fuente (se usará fuente por defecto)"
 
 def fnt(size: int) -> ImageFont.FreeTypeFont:
     if _font_path:
