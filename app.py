@@ -34,7 +34,7 @@ W, H = 1080, 1350
 MARGIN = 55
 FONT_DIR = Path("fonts")
 FONT_PATH = FONT_DIR / "FredokaOne.ttf"
-FONT_URL = "https://fonts.gstatic.com/s/fredokaone/v14/jAnEgHdjHcjgfIb1ZcUCMY-h3cWkWg.ttf"
+FONT_URL = "https://github.com/google/fonts/raw/main/ofl/fredokaone/FredokaOne-Regular.ttf"
 
 # ── Presets basados en los diseños reales ──────────────────────────────────────
 PRESETS = {
@@ -79,6 +79,10 @@ PRESETS = {
 @st.cache_resource
 def load_font():
     FONT_DIR.mkdir(exist_ok=True)
+    # Borra archivo corrupto/vacío de intentos previos
+    if FONT_PATH.exists() and FONT_PATH.stat().st_size < 1000:
+        FONT_PATH.unlink()
+
     if not FONT_PATH.exists():
         try:
             r = requests.get(FONT_URL, timeout=15)
